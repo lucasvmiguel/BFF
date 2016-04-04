@@ -1,9 +1,18 @@
-import * as config from './config/config';
+import "babel-polyfill";
 
-function async main(){
-  const configObj = await config.Read(__dirname + '/development.json');
-  console.log(`${__dirname}/development.json`);
-  console.log(configObj);
+import * as configLib from './config/config';
+import * as api from './api/server';
+
+const environment = process.env.env || 'development';
+
+let {config, error} = configLib.Read({path: `envs/${environment}.json`});
+if(error){
+  console.log(error);
+  process.exit();
 }
 
-main();
+error = api.Start({port: config.port});
+if(error){
+  console.log(error);
+  process.exit();
+}
